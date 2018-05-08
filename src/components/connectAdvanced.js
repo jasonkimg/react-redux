@@ -1,5 +1,34 @@
 import hoistStatics from 'hoist-non-react-statics'
-import invariant from 'invariant'
+
+var invariant = function(condition, format, a, b, c, d, e, f) {
+  var NODE_ENV = process.env.NODE_ENV;
+  if (NODE_ENV !== 'production') {
+    if (format === undefined) {
+      throw new Error('invariant requires an error message argument');
+    }
+  }
+
+  if (!condition) {
+    var error;
+    if (format === undefined) {
+      error = new Error(
+        'Minified exception occurred; use the non-minified dev environment ' +
+        'for the full error message and additional helpful warnings.'
+      );
+    } else {
+      var args = [a, b, c, d, e, f];
+      var argIndex = 0;
+      error = new Error(
+        format.replace(/%s/g, function() { return args[argIndex++]; })
+      );
+      error.name = 'Invariant Violation';
+    }
+
+    error.framesToPop = 1; // we don't care about invariant's own frame
+    throw error;
+  }
+};
+// import invariant from 'invariant'
 import { Component, createElement } from 'react'
 
 import Subscription from '../utils/Subscription'
